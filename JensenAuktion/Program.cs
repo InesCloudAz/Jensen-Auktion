@@ -1,6 +1,23 @@
-var builder = WebApplication.CreateBuilder(args);
-var app = builder.Build();
+using JensenAuktion.Repository.Repos;
 
-app.MapGet("/", () => "Hello World!");
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddEndpointsApiExplorer();
+
+
+builder.Services.AddScoped<UserRepo>();
+
+builder.Services.AddControllers();
+
+
+
+
+var app = builder.Build();
+app.UseSession();
+
+
+app.UseRouting();
+app.UseEndpoints(endpoints => {  endpoints.MapControllers(); });
+
 
 app.Run();
