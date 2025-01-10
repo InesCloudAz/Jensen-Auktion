@@ -22,7 +22,7 @@ namespace JensenAuktion.Controllers
         public IActionResult InsertUser(User user)
         {
             _userRepo.InsertUser(user);
-            return Created();
+            return Ok();
         }
 
         [HttpPut]
