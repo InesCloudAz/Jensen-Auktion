@@ -18,10 +18,18 @@ namespace JensenAuktion.Controllers
         }
 
         [HttpPost]
-        public IActionResult InsertUser (User user)
+        public IActionResult InsertUser(User user)
         {
             _userRepo.InsertUser(user);
             return Created();
         }
+
+        [HttpPut]
+        public IActionResult UpdateUser(User user)
+        {
+            _userRepo.UpdateUser(user);
+            return NoContent();
+        }
     }
 }
+

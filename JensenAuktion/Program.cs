@@ -1,34 +1,20 @@
+using JensenAuktion.Repository.Interfaces;
 using JensenAuktion.Repository.Repos;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<IUserRepo, UserRepo>();
 
-
-
-
-
-builder.Services.AddEndpointsApiExplorer();
-
-
-builder.Services.AddScoped<UserRepo>();
-
-builder.Services.AddControllers();
-
-
-
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession();
 
 var app = builder.Build();
-app.UseSession();
-
-
-app.UseRouting();
-app.UseEndpoints(endpoints => {  endpoints.MapControllers(); });
 
 app.UseSwagger();
 app.UseSwaggerUI();
-app.UseRouting();
 
-app.Run();
+app.UseSession();
+app.UseAuthorization();
+app.MapControllers(); app.Run();

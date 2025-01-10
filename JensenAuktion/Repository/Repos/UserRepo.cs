@@ -1,11 +1,12 @@
 ﻿using Dapper;
 using JensenAuktion.Repository.Entities;
+using JensenAuktion.Repository.Interfaces;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
 namespace JensenAuktion.Repository.Repos
 {
-    public class UserRepo
+    public class UserRepo : IUserRepo
     {
 
         private readonly string _connString;
@@ -32,6 +33,25 @@ namespace JensenAuktion.Repository.Repos
 
             }
 
+        }
+
+        public void UpdateUser(User user)
+        {
+            using (IDbConnection db = new SqlConnection(_connString))
+            {
+                db.Open();
+                DynamicParameters parameters = new DynamicParameters();
+
+                parameters.Add("@UserID", user.UserID);
+                parameters.Add("@UserName", user.UserName);
+                parameters.Add("@Password", user.Password);
+
+
+                db.Execute("UpdateUser"
+                        , parameters
+                        , commandType: CommandType.StoredProcedure);
+
+            }
         }
 
     }
