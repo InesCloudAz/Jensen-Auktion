@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using JensenAuktion.Interfaces;
 using JensenAuktion.Repository.Entities;
 using JensenAuktion.Repository.Interfaces;
 using Microsoft.Data.SqlClient;
@@ -9,16 +10,16 @@ namespace JensenAuktion.Repository.Repos
     public class UserRepo : IUserRepo
     {
 
-        private readonly string _connString;
+        private readonly IJensenAuctionContext _context;
 
-        public  UserRepo()
+        public  UserRepo(IJensenAuctionContext context)
         {
-            _connString = "Data Source=localhost;Initial Catalog=JensenAuktion;Integrated Security=SSPI; TrustServerCertificate=True;";
+            _context = context;
         }
 
         public void InsertUser(User user)
         {
-            using (IDbConnection db = new SqlConnection(_connString))
+            using (IDbConnection db = _context.GetConnection())
             {
                 db.Open();
                 DynamicParameters parameters = new DynamicParameters();
@@ -37,7 +38,7 @@ namespace JensenAuktion.Repository.Repos
 
         public void UpdateUser(User user)
         {
-            using (IDbConnection db = new SqlConnection(_connString))
+            using (IDbConnection db = _context.GetConnection())
             {
                 db.Open();
                 DynamicParameters parameters = new DynamicParameters();

@@ -1,4 +1,5 @@
 ﻿using JensenAuktion.Repository.Entities;
+using JensenAuktion.Repository.Interfaces;
 using JensenAuktion.Repository.Repos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,11 +11,11 @@ namespace JensenAuktion.Controllers
     public class UserController : ControllerBase
     {
 
-        private readonly UserRepo _userRepo;
+        private readonly IUserRepo _userRepo;
 
-        public UserController(UserRepo userRepo)
+        public UserController(IUserRepo userRepo)
         {
-            _userRepo = new UserRepo();
+            _userRepo = userRepo;
         }
 
         [HttpPost]
@@ -28,7 +29,7 @@ namespace JensenAuktion.Controllers
         public IActionResult UpdateUser(User user)
         {
             _userRepo.UpdateUser(user);
-            return NoContent();
+            return Ok();
         }
     }
 }
