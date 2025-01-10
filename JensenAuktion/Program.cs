@@ -1,9 +1,12 @@
+using JensenAuktion;
+using JensenAuktion.Interfaces;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
 builder.Services.AddSwaggerGen();
-
+builder.Services.AddScoped<IJensenAuctionContext, JensenAuctionContext>();
 
 
 
