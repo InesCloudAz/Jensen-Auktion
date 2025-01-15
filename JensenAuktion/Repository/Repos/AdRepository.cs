@@ -1,4 +1,4 @@
-﻿namespace JensenAuktion.Repository
+﻿namespace JensenAuktion.Repository.Repos
 {
     public class AdRepository
     {
