@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IUserRepo, UserRepo>();
+builder.Services.AddScoped<IBidRepo, BidRepo>();
 
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
@@ -21,4 +22,5 @@ app.UseSwaggerUI();
 
 app.UseSession();
 app.UseAuthorization();
-app.MapControllers(); app.Run();
+app.MapControllers(); 
+app.Run();
