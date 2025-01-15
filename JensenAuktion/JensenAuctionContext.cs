@@ -9,7 +9,7 @@ namespace JensenAuktion
 
         public JensenAuctionContext(IConfiguration config)
         {
-            _connString = config.GetConnectionString("JensenAuction");
+            _connString = config.GetConnectionString("JensenAuktion");
         }
         public SqlConnection GetConnection()
         {
