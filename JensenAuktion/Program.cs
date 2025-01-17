@@ -12,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+
 builder.Services.AddAuthentication(opt =>
 {
     opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -36,7 +37,7 @@ builder.Services.AddSwaggerGen(c =>
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
         In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Description = "Skriv 'Bearer <din-token>' för att autentisera.",
+        Description = "Skriv 'Bearer <din-token>' fï¿½r att autentisera.",
         Name = "Authorization",
         Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey
     });
@@ -59,10 +60,13 @@ builder.Services.AddSwaggerGen(c =>
 
 
 builder.Services.AddAuthorization();
+builder.Services.AddCors();
+
 
 
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IUserRepo, UserRepo>();
+builder.Services.AddScoped<IBidRepo, BidRepo>();
 
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
@@ -71,10 +75,15 @@ builder.Services.AddScoped<UserService>();
 
 var app = builder.Build();
 
+app.UseCors(policy => 
+    policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()
+);
+
 app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapControllers(); app.Run();
+app.MapControllers(); 
+app.Run();
