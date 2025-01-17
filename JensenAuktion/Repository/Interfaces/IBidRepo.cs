@@ -2,10 +2,10 @@
 
 namespace JensenAuktion.Repository.Interfaces
 {
-    public interface IBid
+    public interface IBidRepo
     {
-        Bid CreateBid(Bid bid);
-        Bid DeleteBid(Bid bid);
+        int CreateBid(Bid bid);
+        bool DeleteBid(int bidID);
 
     }
 }
