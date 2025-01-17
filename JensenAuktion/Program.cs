@@ -66,7 +66,9 @@ builder.Services.AddCors();
 
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IUserRepo, UserRepo>();
+builder.Services.AddScoped<IAdRepository, AdRepository>();
 builder.Services.AddScoped<IBidRepo, BidRepo>();
+
 
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();

@@ -1,9 +1,10 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using JensenAuktion.Repository.Entities;
+using Microsoft.Data.SqlClient;
 
 namespace JensenAuktion.Interfaces
 {
     public interface IJensenAuctionContext
     {
-        public SqlConnection GetConnection();
+        SqlConnection GetConnection();
     }
 }
