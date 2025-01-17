@@ -1,10 +1,13 @@
-﻿using JensenAuktion.Interfaces;
+﻿using Dapper;
+using JensenAuktion.Interfaces;
 using JensenAuktion.Repository.Entities;
+using JensenAuktion.Repository.Interfaces;
 using Microsoft.Extensions.Configuration.UserSecrets;
+using System.Data;
 
 namespace JensenAuktion.Repository.Repos
 {
-    public class AdRepository
+    public class AdRepository : IAdRepository
     {
         private readonly IJensenAuctionContext _context;
 
@@ -12,48 +15,70 @@ namespace JensenAuktion.Repository.Repos
         {
             _context = context;
         }
-
-        // skapa ad
         public void CreateAd(Ad ad)
         {
-            if (_context.Ads is List<Ad> ads)
+            using (IDbConnection db = _context.GetConnection())
             {
-                ads.Add(ad);
-                _context.SaveChanges();
+                db.Open();
+
+                DynamicParameters parameters = new DynamicParameters();
+
+                parameters.Add("@Title", ad.Title);
+                parameters.Add("@Description", ad.Description);
+                parameters.Add("@Price", ad.Price);
+                parameters.Add("@StartTime", ad.StartTime);
+                parameters.Add("@EndTime", ad.EndTime);
+                parameters.Add("@UserId", ad.UserId);
+
+                db.Execute("CreateAd", parameters, commandType: CommandType.StoredProcedure);
             }
         }
 
         public List<Ad> GetAllAds()
         {
-            return (_context.Ads as IEnumerable<Ad>)?.ToList() ?? new List<Ad>();
-        }
+            using (IDbConnection db = _context.GetConnection())
+            {
+                db.Open();
 
-        // Get ad by ID
-        public Ad GetAdById(int id)
-        {
-            return (_context.Ads as IEnumerable<Ad>)?.FirstOrDefault(ad => ad.AdID == id);
+                var Ads = db.Query<Ad>("GetAllAds", commandType: CommandType.StoredProcedure).ToList();
+
+                return Ads;
+            }
         }
 
         // Updatera ad
         public void UpdateAd(Ad ad)
         {
-            var ads = _context.Ads as List<Ad>;
-            var existingAd = ads?.FirstOrDefault(a => a.AdID == ad.AdID);
-            if (existingAd != null)
+            using (IDbConnection db = _context.GetConnection())
             {
-                ads.Remove(existingAd);
-                ads.Add(ad);
-                _context.SaveChanges();
+                db.Open();
+
+                DynamicParameters parameters = new DynamicParameters();
+
+                parameters.Add("@Title", ad.Title);
+                parameters.Add("@Description", ad.Description);
+                parameters.Add("@Price", ad.Price);
+                parameters.Add("@StartTime", ad.StartTime);
+                parameters.Add("@EndTime", ad.EndTime);
+                parameters.Add("@UserId", ad.UserId);
+                parameters.Add("@AdId", ad.AdID);
+
+                db.Execute("UpdateAd", parameters, commandType: CommandType.StoredProcedure);
             }
         }
 
         // radera ad
-        public void DeleteAd(Ad ad)
+        public void DeleteAd(int adId)
         {
-            if (_context.Ads is List<Ad> ads)
+            using (IDbConnection db = _context.GetConnection())
             {
-                ads.Remove(ad);
-                _context.SaveChanges();
+                db.Open();
+
+                DynamicParameters parameters = new DynamicParameters();
+
+                parameters.Add("@AdId", adId);
+
+                db.Execute("DeleteAd", parameters, commandType: CommandType.StoredProcedure);
             }
         }
     }

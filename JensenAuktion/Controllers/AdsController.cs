@@ -1,10 +1,7 @@
-﻿using JensenAuktion.Interfaces;
-using JensenAuktion.Repository.Entities;
+﻿using JensenAuktion.Repository.Entities;
+using JensenAuktion.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Client;
-using System.Linq.Expressions;
 
 namespace JensenAuktion.Controllers
 {
@@ -12,30 +9,26 @@ namespace JensenAuktion.Controllers
     [ApiController]
     public class AdsController : ControllerBase
     {
-        private readonly IJensenAuctionContext _adRepository;
-        public AdsController(IJensenAuctionContext adRepository)
+        private readonly IAdRepository _adRepository;
+        public AdsController(IAdRepository adRepository)
         {
             _adRepository = adRepository;
         }
 
         [HttpPost]
-        [Authorize]
-        public IActionResult CreateAd( Ad newAd)
+        //[Authorize]
+        public IActionResult CreateAd(Ad ad)
         {
             try
             {
-                var userId = int.Parse(User.FindFirst("id").Value);
-                newAd.OwnerID = userId;
-
-                _adRepository.AddAd(newAd);
-                _adRepository.SaveChanges();
-
-                return CreatedAtAction(nameof(CreateAd), new { id = newAd.AdID }, newAd);
+                _adRepository.CreateAd(ad);
             }
             catch (Exception ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
+
+            return Ok(ad);
         }
 
         [HttpGet]
@@ -52,78 +45,37 @@ namespace JensenAuktion.Controllers
             }
         }
 
-        [HttpGet("{id}")]
-        public IActionResult GetAdByID(int id)
+        [HttpPut]
+        //[Authorize]
+        public IActionResult UpdateAd(Ad ad)
         {
-            var ad = _adRepository.GetAdById(id);
-
-            if (ad == null)
+            try
             {
-                return NotFound(new { message = "Ad not found" });
+                _adRepository.UpdateAd(ad);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
 
             return Ok(ad);
         }
 
-        [HttpPut("{id}")]
-        [Authorize]
-        public IActionResult PutAd(int id,Ad updatedAd)
-        {
-            try
-            {
-                var userId = int.Parse(User.FindFirst("id").Value);
-                var ad = _adRepository.GetAdById(id) as Ad;
-
-                if (ad == null)
-                    return NotFound(new { message = "Ad not found" });
-
-                if (ad.OwnerID != userId)
-                {
-                    return Forbid("You can only update your own ads");
-                }
-
-                // Update allowed fields
-                ad.Title = updatedAd.Title;
-                ad.Description = updatedAd.Description;
-                ad.Price = updatedAd.Price;
-                ad.StartDate = updatedAd.StartDate;
-                ad.EndDate = updatedAd.EndDate;
-
-                _adRepository.UpdateAd(ad);
-
-                return Ok(new { message = "Ad updated successfully" });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
 
         [HttpDelete("{id}")]
-        [Authorize]
+        //[Authorize]
         public IActionResult DeleteAd(int id)
         {
             try
             {
-                var userId = int.Parse(User.FindFirst("id").Value);
-                var ad = _adRepository.GetAdById(id) as Ad;
-
-                if (ad == null)
-                    return NotFound(new { message = "Ad not found" });
-
-                if (ad.OwnerID != userId)
-                {
-                    return Forbid("You can only delete your own ads");
-                }
-
-                _adRepository.DeleteAd(ad);
-
-                return Ok(new { message = "Ad deleted successfully" });
+                _adRepository.DeleteAd(id);
             }
             catch (Exception ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
+
+            return Ok($"Ad {id} deleted");
         }
     }
 }
