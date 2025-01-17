@@ -2,6 +2,8 @@
 {
     public class Ad
     {
+        internal object Id;
+
         public int AdID  { get; set; } 
         public string Title { get; set; }
         public string Description { get; set; }
@@ -11,5 +13,6 @@
 
         public DateTime EndDate { get; set; }   
 
+       public int OwnerID { get; set; }
     }
 }
