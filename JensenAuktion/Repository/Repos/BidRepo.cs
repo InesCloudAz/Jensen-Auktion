@@ -52,5 +52,5 @@ namespace JensenAuktion.Repository.Repos
                     return parameters.Get<bool>("@IsDeleted");
                 }
             }
-        }
+    }
 }
