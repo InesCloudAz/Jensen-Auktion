@@ -64,6 +64,8 @@ namespace JensenAuktion.Repository.Repos
 
                 return parameters.Get<bool>("@HasBids");
             }
+PBI-34
         }
+master
     }
 }
