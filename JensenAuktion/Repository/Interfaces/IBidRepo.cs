@@ -6,6 +6,6 @@ namespace JensenAuktion.Repository.Interfaces
     {
         int CreateBid(Bid bid);
         bool DeleteBid(int bidID);
-
+        bool HasBids(int adId);
     }
 }
