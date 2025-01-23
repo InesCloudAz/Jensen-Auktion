@@ -103,11 +103,92 @@ BEGIN
     WHERE AdID = @AdID;
 END;
 
-create procedure GetAllAds
-as
-begin
-	select a.AdID, Title, Description, a.Price, StartTime, EndTime, b.Price as BidPrice from Ad a
-	inner join Bid b on a.AdID = b.AdID
-end
+ALTER PROCEDURE GetAllAds
+AS
+BEGIN
+    SELECT 
+        a.AdID, 
+        a.Title, 
+        a.Description, 
+        a.Price, 
+        a.StartTime, 
+        a.EndTime, 
+        b.BidId, 
+        b.Price,
+		b.UserID
+    FROM 
+        Ad a
+    LEFT JOIN 
+        Bid b ON a.AdID = b.AdID
+    WHERE 
+        b.Price = (
+            SELECT MAX(Price)
+            FROM Bid
+            WHERE AdID = a.AdID
+        );
+END
 
-select * from Ad
+
+Create Procedure GetAdById
+    @AdID INT
+As
+Begin
+    Select 
+        AdID,
+        Title,
+        Description,
+        Price,
+        StartTime,
+        EndTime,
+        UserID
+    From 
+        Ad
+    Where 
+        AdID = @AdID;
+End;
+
+Create Procedure GetClosedAdById
+    @AdID INT
+As
+Begin
+    SELECT 
+        a.AdID, 
+        a.Title, 
+        a.Description, 
+        a.Price, 
+        a.StartTime, 
+        a.EndTime, 
+        b.BidId, 
+        b.Price,
+		b.UserID
+    FROM 
+        Ad a
+    LEFT JOIN 
+        Bid b ON a.AdID = b.AdID
+    WHERE 
+        b.Price = (
+            SELECT MAX(Price)
+            FROM Bid
+            WHERE AdID = a.AdID
+        );
+End;
+
+create procedure UpdateAdWithBid( @AdID INT,
+    @Title VARCHAR(80),
+    @Description VARCHAR(MAX),
+    @StartTime DATETIME,
+    @EndTime DATETIME,
+    @UserID INT)
+	as
+	begin
+	 UPDATE Ad
+    SET 
+        Title = @Title,
+        Description = @Description,
+        StartTime = @StartTime,
+        EndTime = @EndTime
+    WHERE AdID = @AdID;
+
+	end
+
+create procedure Get

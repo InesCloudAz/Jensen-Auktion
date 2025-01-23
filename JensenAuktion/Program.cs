@@ -74,6 +74,7 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
 builder.Services.AddScoped<IJensenAuctionContext, JensenAuctionContext>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<IAdsService, AdsService>();
 
 var app = builder.Build();
 

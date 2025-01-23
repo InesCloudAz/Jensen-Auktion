@@ -1,18 +1,20 @@
-﻿using JensenAuktion.Repository.Entities;
+﻿using JensenAuktion.Repository.DTO;
+using JensenAuktion.Repository.Entities;
 using Microsoft.Data.SqlClient;
 
 namespace JensenAuktion.Repository.Interfaces
 {
     public interface IAdRepository
     {
-        void CreateAd(Ad ad);
-        void DeleteAd(int id);
-        Ad GetAdById(int adID);
-        List<Ad> GetAllAds();
-        void UpdateAd(Ad ad); // Added method definition
-
-        bool DeleteAdIfNoBids(int adId);
-        bool UpdateAdWithBidCheck(Ad ad);
+        public void CreateAd(AdsCreateDTO ad);
+        public void DeleteAd(int id);
+        public AdsDTO GetAdById(int adID);
+        public List<Ad> GetAllAds();
+        public void UpdateAd(Ad ad); 
+        public void UpdateAdWithBid(Ad ad);
+        public bool DeleteAdIfNoBids(int adId);
+        public bool UpdateAdWithBidCheck(Ad ad);
+        public Ad GetClosedAdById(int adID);
     }
             
         

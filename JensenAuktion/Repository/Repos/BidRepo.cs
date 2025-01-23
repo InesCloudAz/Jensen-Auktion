@@ -1,6 +1,5 @@
 ﻿using Dapper;
 using JensenAuktion.Repository.Entities;
-using static JensenAuktion.Repository.Repos.BidRepo;
 using System.Data;
 using JensenAuktion.Repository.Interfaces;
 using JensenAuktion.Interfaces;
@@ -50,6 +49,20 @@ namespace JensenAuktion.Repository.Repos
             }
         }
 
+        public Bid GetBidById(int bidId)
+        {
+            using (var db = _context.GetConnection())
+            {
+                db.Open();
+
+                DynamicParameters parameters = new DynamicParameters();
+                parameters.Add("@BidId", bidId);
+
+                return db.Query<Bid>("GetBidById", parameters, commandType: CommandType.StoredProcedure).SingleOrDefault();
+
+            }
+        }
+
         public bool HasBids(int adId)
         {
             using (var db = _context.GetConnection())
@@ -64,8 +77,6 @@ namespace JensenAuktion.Repository.Repos
 
                 return parameters.Get<bool>("@HasBids");
             }
-PBI-34
         }
-master
     }
 }

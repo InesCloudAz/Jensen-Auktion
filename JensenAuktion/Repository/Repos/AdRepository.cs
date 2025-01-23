@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using JensenAuktion.Interfaces;
+using JensenAuktion.Repository.DTO;
 using JensenAuktion.Repository.Entities;
 using JensenAuktion.Repository.Interfaces;
 using Microsoft.Extensions.Configuration.UserSecrets;
@@ -15,7 +16,7 @@ namespace JensenAuktion.Repository.Repos
         {
             _context = context;
         }
-        public void CreateAd(Ad ad)
+        public void CreateAd(AdsCreateDTO ad)
         {
             using (IDbConnection db = _context.GetConnection())
             {
@@ -40,13 +41,17 @@ namespace JensenAuktion.Repository.Repos
             {
                 db.Open();
 
-                var Ads = db.Query<Ad>("GetAllAds", commandType: CommandType.StoredProcedure).ToList();
+                var Ads = db.Query<Ad, Bid, Ad>("GetAllAds",(ad, bid) =>
+                {
+                    ad.Bid = bid;
+                    return ad;                    
+
+                }, splitOn: "BidId", commandType: CommandType.StoredProcedure).ToList();
 
                 return Ads;
             }
         }
 
-        // Updatera ad
         public void UpdateAd(Ad ad)
         {
             using (IDbConnection db = _context.GetConnection())
@@ -67,7 +72,25 @@ namespace JensenAuktion.Repository.Repos
             }
         }
 
-        // radera ad
+        public void UpdateAdWithBid(Ad ad)
+        {
+            using (IDbConnection db = _context.GetConnection())
+            {
+                db.Open();
+
+                DynamicParameters parameters = new DynamicParameters();
+
+                parameters.Add("@Title", ad.Title);
+                parameters.Add("@Description", ad.Description);
+                parameters.Add("@StartTime", ad.StartTime);
+                parameters.Add("@EndTime", ad.EndTime);
+                parameters.Add("@UserId", ad.UserId);
+                parameters.Add("@AdId", ad.AdID);
+
+                db.Execute("UpdateAdWithBid", parameters, commandType: CommandType.StoredProcedure);
+            }
+        }
+
         public void DeleteAd(int adId)
         {
             using (IDbConnection db = _context.GetConnection())
@@ -81,7 +104,41 @@ namespace JensenAuktion.Repository.Repos
                 db.Execute("DeleteAd", parameters, commandType: CommandType.StoredProcedure);
             }
         }
-        public Ad GetAdById(int adID)
+        public AdsDTO GetAdById(int adID)
+        {
+            using (IDbConnection db = _context.GetConnection())
+            {
+                db.Open();
+
+                var adDictionary = new Dictionary<int, AdsDTO>();
+
+                DynamicParameters parameters = new DynamicParameters();
+                parameters.Add("@AdId", adID);
+
+                var searchedAd = db.Query<AdsDTO, Bid, AdsDTO>("GetAdById", (ad, bid) =>
+                {
+                    // Check if the ad already exists in the dictionary
+                    if (!adDictionary.TryGetValue(ad.AdID, out var currentAd))
+                    {
+                        currentAd = ad;
+                        currentAd.Bid = new List<Bid>();
+                        adDictionary.Add(currentAd.AdID, currentAd);
+                    }
+
+                    // Add bid to the ad's bid list if it's not null
+                    if (bid != null)
+                    {
+                        currentAd.Bid.Add(bid);
+                    }
+
+                    return currentAd;
+                }, parameters, splitOn: "BidId", commandType: CommandType.StoredProcedure).FirstOrDefault();
+
+                return searchedAd;
+            }
+        }
+
+        public Ad GetClosedAdById(int adID)
         {
             using (IDbConnection db = _context.GetConnection())
             {
@@ -90,7 +147,13 @@ namespace JensenAuktion.Repository.Repos
                 DynamicParameters parameters = new DynamicParameters();
                 parameters.Add("@AdId", adID);
 
-                return db.QuerySingleOrDefault<Ad>("GetAdById", parameters, commandType: CommandType.StoredProcedure);
+                var searchedAd = db.Query<Ad, Bid, Ad>("GetAdById",(ad, bid) =>
+                {
+                    ad.Bid = bid;
+                    return ad;
+                }, parameters, splitOn:("BidId"), commandType: CommandType.StoredProcedure).FirstOrDefault();
+
+                return searchedAd;
             }
         }
 
