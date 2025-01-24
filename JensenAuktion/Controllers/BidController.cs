@@ -23,20 +23,15 @@ namespace JensenAuktion.Controllers
         public IActionResult CreateBid([FromBody] Bid bid)
         {
             if (bid == null) return BadRequest("Bid data is invalid.");
-            var userIdFromToken = User.FindFirstValue(ClaimTypes.Sid);
-            var userId = _adsService.CheckAdUserId(bid.AdID).ToString();
             try
             {
                 if (_adsService.IsAdClosed(bid.AdID))
                 {
                     return BadRequest("You can't place a bid on a closed Ad");
                 }
-                else if (userId == userIdFromToken)
+                if (bid == null)
                 {
-                    return BadRequest("You can't place a bid on your own ad");
-                } else if (_adsService.GetHighestBid(bid.AdID).Price > bid.Price)
-                {
-                    return BadRequest("You can't place a bid lower than the current bid");
+                    return BadRequest("Bid data is invalid.");
                 }
                 int newBidID = _bidRepo.CreateBid(bid);
                 return Ok(new { BidID = newBidID, Message = "Bid created successfully." });
@@ -52,18 +47,20 @@ namespace JensenAuktion.Controllers
         {
             try
             {
-                if (_adsService.IsAdClosedByBid(id))
-                {
-                    return BadRequest("You can't remove a bid on a closed Ad");
-                }
-
                 bool isDeleted = _bidRepo.DeleteBid(id);
+                if (isDeleted)
+                {
+                    return Ok(new { Message = "Bid deleted successfully." });
+                }
+                else
+                {
+                    return NotFound($"Bid with ID {id} not found.");
+                }
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
-            return Ok(id + " Is deleted");
         }
     }
 }
