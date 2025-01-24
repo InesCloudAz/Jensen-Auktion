@@ -44,9 +44,18 @@ namespace JensenAuktion.Services
 
         public int CheckAdUserId(int id)
         {
-              var ad = _adRepository.GetAdById(id);
+            var ad = _adRepository.GetAdById(id);
 
             return ad.UserId;
+        }
+
+        public Bid GetHighestBid(int id)
+        {
+            var ad = _adRepository.GetAdById(id);
+
+            var highestBid = ad.Bid.Max();
+
+            return highestBid;
         }
     }
 }

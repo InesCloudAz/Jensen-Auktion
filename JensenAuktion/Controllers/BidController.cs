@@ -34,6 +34,9 @@ namespace JensenAuktion.Controllers
                 else if (userId == userIdFromToken)
                 {
                     return BadRequest("You can't place a bid on your own ad");
+                } else if (_adsService.GetHighestBid(bid.AdID).Price > bid.Price)
+                {
+                    return BadRequest("You can't place a bid lower than the current bid");
                 }
                 int newBidID = _bidRepo.CreateBid(bid);
                 return Ok(new { BidID = newBidID, Message = "Bid created successfully." });
