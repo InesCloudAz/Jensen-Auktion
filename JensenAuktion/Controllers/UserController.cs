@@ -4,6 +4,7 @@ using JensenAuktion.Repository.Interfaces;
 using JensenAuktion.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace JensenAuktion.Controllers
 {
@@ -49,7 +50,7 @@ namespace JensenAuktion.Controllers
             }
 
             // Hämta UserID från token
-            var userIdFromToken = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value;
+            var userIdFromToken = User.FindFirstValue(ClaimTypes.Sid);
 
             //if (string.IsNullOrEmpty(userIdFromToken) || user.UserID.ToString() != userIdFromToken)
 

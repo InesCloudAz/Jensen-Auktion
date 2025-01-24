@@ -18,7 +18,7 @@ namespace JensenAuktion.Services
             {
                 new Claim(ClaimTypes.Name, user.UserName),
                 //new Claim("UserID", user.UserID.ToString()), 
-                new Claim("UserID", user.UserID.ToString()), 
+                new Claim(ClaimTypes.Sid, user.UserID.ToString()), 
                 //new Claim(ClaimTypes.Role, "Admin")
             };
             //claims.Add(new Claim(ClaimTypes.Role, "Admin"));

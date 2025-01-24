@@ -1,8 +1,7 @@
 ﻿using JensenAuktion.Repository.Entities;
 using JensenAuktion.Repository.Interfaces;
-using JensenAuktion.Repository.Repos;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace JensenAuktion.Controllers
 {
@@ -11,23 +10,29 @@ namespace JensenAuktion.Controllers
     public class BidController : ControllerBase
     {
         private readonly IBidRepo _bidRepo;
+        private readonly IAdsService _adsService;
 
-        public BidController(IBidRepo bidRepo)
+        public BidController(IBidRepo bidRepo, IAdsService adsService)
         {
             _bidRepo = bidRepo;
+            _adsService = adsService;
         }
 
         // POST: api/Bid
         [HttpPost]
         public IActionResult CreateBid([FromBody] Bid bid)
         {
-            if (bid == null)
-            {
-                return BadRequest("Bid data is invalid.");
-            }
-
+            if (bid == null) return BadRequest("Bid data is invalid.");
             try
             {
+                if (_adsService.IsAdClosed(bid.AdID))
+                {
+                    return BadRequest("You can't place a bid on a closed Ad");
+                }
+                if (bid == null)
+                {
+                    return BadRequest("Bid data is invalid.");
+                }
                 int newBidID = _bidRepo.CreateBid(bid);
                 return Ok(new { BidID = newBidID, Message = "Bid created successfully." });
             }
@@ -37,7 +42,6 @@ namespace JensenAuktion.Controllers
             }
         }
 
-        
         [HttpDelete("{id}")]
         public IActionResult DeleteBid(int id)
         {

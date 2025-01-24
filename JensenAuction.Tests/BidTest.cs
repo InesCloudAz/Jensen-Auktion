@@ -1,9 +1,10 @@
 using JensenAuktion.Controllers;
 using JensenAuktion.Repository.Entities;
 using JensenAuktion.Repository.Interfaces;
-using JensenAuktion.Repository.Repos;
+using JensenAuktion.Services;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using Xunit;
 
 namespace JensenAuctionBid.Tests
 {
@@ -14,10 +15,12 @@ namespace JensenAuctionBid.Tests
         {
             // Arrange
             var mockBidRepo = new Mock<IBidRepo>();
+            var mockAdsService = new Mock<IAdsService>();
             var bid = new Bid { Price = 100.5f, AdID = 1, UserID = 2 };
             mockBidRepo.Setup(repo => repo.CreateBid(bid)).Returns(123);
+            mockAdsService.Setup(service => service.IsAdClosed(It.IsAny<int>())).Returns(false);
 
-            var controller = new BidController(mockBidRepo.Object);
+            var controller = new BidController(mockBidRepo.Object, mockAdsService.Object);
 
             // Act
             var result = controller.CreateBid(bid);
@@ -39,14 +42,14 @@ namespace JensenAuctionBid.Tests
             Assert.Equal("Bid created successfully.", (string)message);
         }
 
-
-
         [Fact]
         public void CreateBid_NullBid_ReturnsBadRequest()
         {
             // Arrange
             var mockBidRepo = new Mock<IBidRepo>();
-            var controller = new BidController(mockBidRepo.Object);
+            var mockAdsService = new Mock<IAdsService>();
+            mockAdsService.Setup(service => service.IsAdClosed(It.IsAny<int>())).Returns(false);
+            var controller = new BidController(mockBidRepo.Object, mockAdsService.Object);
 
             // Act
             var result = controller.CreateBid(null);
@@ -60,9 +63,11 @@ namespace JensenAuctionBid.Tests
         {
             // Arrange
             var mockBidRepo = new Mock<IBidRepo>();
+            var mockAdsService = new Mock<IAdsService>();
             mockBidRepo.Setup(repo => repo.DeleteBid(123)).Returns(true);
+            mockAdsService.Setup(service => service.IsAdClosed(It.IsAny<int>())).Returns(false);
 
-            var controller = new BidController(mockBidRepo.Object);
+            var controller = new BidController(mockBidRepo.Object, mockAdsService.Object);
 
             // Act
             var result = controller.DeleteBid(123);
@@ -80,16 +85,16 @@ namespace JensenAuctionBid.Tests
             Assert.Equal("Bid deleted successfully.", (string)message);
         }
 
-
-
         [Fact]
         public void DeleteBid_BidNotFound_ReturnsNotFound()
         {
             // Arrange
             var mockBidRepo = new Mock<IBidRepo>();
+            var mockAdsService = new Mock<IAdsService>();
             mockBidRepo.Setup(repo => repo.DeleteBid(123)).Returns(false);
+            mockAdsService.Setup(service => service.IsAdClosed(It.IsAny<int>())).Returns(false);
 
-            var controller = new BidController(mockBidRepo.Object);
+            var controller = new BidController(mockBidRepo.Object, mockAdsService.Object);
 
             // Act
             var result = controller.DeleteBid(123);
@@ -103,10 +108,12 @@ namespace JensenAuctionBid.Tests
         {
             // Arrange
             var mockBidRepo = new Mock<IBidRepo>();
+            var mockAdsService = new Mock<IAdsService>();
             var bid = new Bid { Price = 100.5f, AdID = 1, UserID = 2 };
             mockBidRepo.Setup(repo => repo.CreateBid(bid)).Throws(new System.Exception("Database error"));
+            mockAdsService.Setup(service => service.IsAdClosed(It.IsAny<int>())).Returns(false);
 
-            var controller = new BidController(mockBidRepo.Object);
+            var controller = new BidController(mockBidRepo.Object, mockAdsService.Object);
 
             // Act
             var result = controller.CreateBid(bid);
